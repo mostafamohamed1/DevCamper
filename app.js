@@ -2,16 +2,20 @@ const express = require('express');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 
-//Load env vars
+const bootcampRouter = require('./routes/bootcapmsRoutes');
+
+//Load env VARS
 dotenv.config({ path: './config/config.env' });
 
-const bootcampRouter = require('./routes/bootcapmsRoutes');
 const app = express();
 
-// Dev logging middleware
+// Developmet logger middleware
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+// Body Parser
+app.use(express.json());
 
 // Mount routes
 app.use('/api/v1/bootcamps', bootcampRouter);

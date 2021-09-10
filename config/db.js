@@ -1,3 +1,4 @@
+const colors = require('colors');
 const mongoose = require('mongoose');
 
 const connectDB = async () => {
@@ -6,7 +7,8 @@ const connectDB = async () => {
   });
 
   console.log(
-    `MongoDB Connected: ${conn.connection.host} / Time: ${conn.now()}`
+    `MongoDB Connected: ${conn.connection.host} / Time: ${conn.now()}`.bgGreen
+      .bold
   );
 };
 
