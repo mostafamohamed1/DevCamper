@@ -1,104 +1,91 @@
+const AppError = require('../utils/AppError');
+const catchAsync = require('../middleware/catchAsync');
 const BootcampModel = require('../models/BootcampModel');
 
 // @desc    Get all bootcamps
 // @route   GET /api/v1/bootcamps
 // @access  public
-exports.getBootCamps = async (req, res, next) => {
-  try {
-    const bootcamps = await BootcampModel.find();
-    res.status(200).json({
-      success: true,
-      result: bootcamps.length,
-      data: {
-        bootcamps,
-      },
-    });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
-};
+exports.getBootCamps = catchAsync(async (req, res, next) => {
+  const bootcamps = await BootcampModel.find();
+
+  res.status(200).json({
+    success: true,
+    result: bootcamps.length,
+    data: {
+      bootcamps,
+    },
+  });
+});
 
 // @desc    Get bootcamp
 // @route   GET /api/v1/bootcamps/:id
 // @access  public
-exports.getBootCamp = async (req, res, next) => {
-  try {
-    const bootcamp = await BootcampModel.findById(req.params.id);
+exports.getBootCamp = catchAsync(async (req, res, next) => {
+  const bootcamp = await BootcampModel.findById(req.params.id);
 
-    if (!bootcamp) throw Error('There is no bootcamp with this id.');
+  if (!bootcamp)
+    return next(
+      new AppError(`Bootcamp not found with id of ${req.params.id}`, 404)
+    );
 
-    res.status(200).json({
-      success: true,
-      data: {
-        bootcamp,
-      },
-    });
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message,
-    });
-  }
-};
+  res.status(200).json({
+    success: true,
+    data: {
+      bootcamp,
+    },
+  });
+});
 
 // @desc    Update bootcamp
 // @route   PUT /api/v1/bootcamps/:id
 // @access  Private
-exports.updateBootcamp = async (req, res, next) => {
-  try {
-    const updatedBootcamp = await BootcampModel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
+exports.updateBootcamp = catchAsync(async (req, res, next) => {
+  const updatedBootcamp = await BootcampModel.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!updatedBootcamp)
+    return next(
+      new AppError(`Bootcamp not found with id of ${req.params.id}`, 404)
     );
 
-    if (!updatedBootcamp)
-      throw Error('There is no Bootcamp with this id to update it.');
-
-    res.status(201).json({
-      success: true,
-      data: {
-        updatedBootcamp,
-      },
-    });
-  } catch (err) {
-    res.status(400).json({
-      success: false,
-      message: err.message,
-    });
-  }
-};
+  res.status(201).json({
+    success: true,
+    data: {
+      updatedBootcamp,
+    },
+  });
+});
 
 // @desc    Create new bootcamp
 // @route   POST /api/v1/bootcamps
 // @access  Private
-exports.createBootcamp = async (req, res, next) => {
-  try {
-    const bootcamp = await BootcampModel.create(req.body);
-    res.status(201).json({
-      success: true,
-      data: {
-        bootcamp,
-      },
-    });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
-};
+exports.createBootcamp = catchAsync(async (req, res, next) => {
+  const bootcamp = await BootcampModel.create(req.body);
+
+  res.status(201).json({
+    success: true,
+    data: {
+      bootcamp,
+    },
+  });
+});
 
 // @desc    Delete bootcamp
 // @route   DELETE /api/v1/bootcamps/:id
 // @access  Private
-exports.deleteBootcamp = async (req, res, next) => {
-  try {
-    await BootcampModel.findByIdAndDelete(req.params.id);
+exports.deleteBootcamp = catchAsync(async (req, res, next) => {
+  const deletedBootcamp = await BootcampModel.findByIdAndDelete(req.params.id);
 
-    // res.status(204);
-    res.json({ success: true, data: null });
-  } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
-  }
-};
+  if (!deletedBootcamp)
+    return next(
+      new AppError(`Bootcamp not found with id of ${req.params.id}`, 404)
+    );
+
+  res.json({ success: true, data: null });
+});
