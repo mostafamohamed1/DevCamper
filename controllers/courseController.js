@@ -1,6 +1,6 @@
 const AppError = require('../utils/AppError');
 const catchAsync = require('../middleware/catchAsync');
-const CourseModel = require('../models/courseModel');
+const CourseModel = require('../models/CourseModel');
 const BootcampModel = require('../models/BootcampModel');
 
 // @desc    Get courses
