@@ -8,7 +8,9 @@ const colors = require('colors');
 dotenv.config({ path: './config/config.env' });
 
 const BootcampModel = require('./models/BootcampModel');
-const CourseModel = require('./models/courseModel');
+const CourseModel = require('./models/CourseModel');
+const UserModel = require('./models/UserModel');
+const ReviewModel = require('./models/ReviewModel');
 
 mongoose
 	.connect(process.env.MONGO_URI, {
@@ -26,11 +28,19 @@ const bootcamps = JSON.parse(
 const courses = JSON.parse(
 	fs.readFileSync(path.join(__dirname, '_data', 'courses.json'), 'utf-8')
 );
+const users = JSON.parse(
+	fs.readFileSync(path.join(__dirname, '_data', 'users.json'), 'utf-8')
+);
+const reviews = JSON.parse(
+	fs.readFileSync(path.join(__dirname, '_data', 'reviews.json'), 'utf-8')
+);
 
 const loadData = async () => {
 	try {
 		await BootcampModel.create(bootcamps);
 		await CourseModel.create(courses);
+		await UserModel.create(users);
+		await ReviewModel.create(reviews);
 		console.log('Data Successfully loaded.'.green.inverse);
 	} catch (err) {
 		console.log(err);
@@ -42,6 +52,8 @@ const deleteData = async () => {
 	try {
 		await BootcampModel.deleteMany({});
 		await CourseModel.deleteMany({});
+		await UserModel.deleteMany({});
+		await ReviewModel.deleteMany({});
 		console.log('Data Successfully Deleted.'.green.inverse);
 	} catch (err) {
 		console.log(err);

@@ -49,6 +49,7 @@ exports.getCourse = catchAsync(async (req, res, next) => {
 // @access  Private
 exports.addCourse = catchAsync(async (req, res, next) => {
 	req.body.bootcamp = req.params.bootcampId;
+	req.body.user = req.user.id;
 
 	const bootcamp = await BootcampModel.findById(req.params.bootcampId);
 
@@ -56,6 +57,16 @@ exports.addCourse = catchAsync(async (req, res, next) => {
 		return next(
 			new AppError(`No bootcamp with the id of ${req.params.bootcampId}`, 404)
 		);
+
+	// Make sure user is course owner
+	if (bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return next(
+			new AppError(
+				`User ${req.user.id}  is not authorized to add a course to this bootcamp.`,
+				401
+			)
+		);
+	}
 
 	const course = await CourseModel.create(req.body);
 
@@ -71,12 +82,21 @@ exports.addCourse = catchAsync(async (req, res, next) => {
 // @route   PUT /api/v1/courses/:id
 // @access  Private
 exports.updateCourse = catchAsync(async (req, res, next) => {
-	console.log('COURSE');
 	let course = await CourseModel.findById(req.params.id);
 	console.log(course);
 
 	if (course === undefined)
 		return next(new AppError(`No course with the id of ${req.params.id}`, 404));
+
+	// Make sure user is course owner
+	if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return next(
+			new AppError(
+				`User ${req.user.id}  is not authorized to update a course to this bootcamp.`,
+				401
+			)
+		);
+	}
 
 	course.update(req.body);
 
@@ -96,6 +116,16 @@ exports.deleteCourse = catchAsync(async (req, res, next) => {
 
 	if (!course)
 		return next(new AppError(`No course with the id of ${req.params.id}`, 404));
+
+	// Make sure user is course owner
+	if (course.user.toString() !== req.user.id && req.user.role !== 'admin') {
+		return next(
+			new AppError(
+				`User ${req.user.id}  is not authorized to delete a course to this bootcamp.`,
+				401
+			)
+		);
+	}
 
 	await course.remove();
 

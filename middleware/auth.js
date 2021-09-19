@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const catchAsync = require('./catchAsync');
 const AppError = require('../utils/AppError');
 const UserModel = require('../models/UserModel');
-const { removeListener } = require('../models/UserModel');
 
 // Protect routes
 exports.protect = catchAsync(async (req, res, next) => {
@@ -14,8 +13,12 @@ exports.protect = catchAsync(async (req, res, next) => {
 		token = req.headers.authorization.split(' ')[1];
 	}
 
+	if (req.cookies.token) {
+		token = req.cookies.token;
+	}
+
 	if (!token) {
-		return next(new AppError('Not authorize to access this route.', 401));
+		return next(new AppError('Not authorized to access this route.', 401));
 	}
 	try {
 		// Verify token
@@ -24,7 +27,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 		req.user = await UserModel.findById(decoded.id);
 		next();
 	} catch (err) {
-		return next(new AppError('Not authorize to access this route.', 401));
+		return next(new AppError('Not authorized to access this route.', 401));
 	}
 });
 
