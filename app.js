@@ -7,7 +7,6 @@ const mongoSanitize = require('express-mongo-sanitize');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
-const cookieParser = require('cookie-parser');
 const hpp = require('hpp');
 const cors = require('cors');
 
